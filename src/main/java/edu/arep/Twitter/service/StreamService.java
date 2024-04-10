@@ -1,5 +1,9 @@
 package edu.arep.Twitter.service;
 
+
+
+import java.io.IOException;
+
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -13,9 +17,15 @@ public class StreamService implements RequestHandler<Post, String> {
     private static final Stream stream = new Stream();
 
     @Override
-    public String handleRequest(Post input, Context context) {
-        stream.addPost(input);
-        return getAllPostsJson();
+    public String handleRequest(Post input, Context context) { 
+        try {
+            Post post = objectMapper.readValue(objectMapper.writeValueAsString(input), Post.class);
+            stream.addPost(post);
+            return getAllPostsJson();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "{\"error\": \"Error al deserializar el JSON de entrada\"}";
+        }
     }
 
     private String getAllPostsJson() {

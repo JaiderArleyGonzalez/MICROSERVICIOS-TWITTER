@@ -7,6 +7,10 @@ public class Post {
     private String message;
     private Date creationDate;
 
+    public Post() {
+
+    }
+
     public Post(String owner, String message, Date creationDate) {
         this.owner = owner;
         this.message = message.length() > 140 ? message.substring(0, 140) : message;
