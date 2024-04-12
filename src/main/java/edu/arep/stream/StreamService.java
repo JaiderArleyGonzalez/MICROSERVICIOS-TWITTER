@@ -1,5 +1,4 @@
 package edu.arep.stream;
-
 import java.util.List;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -10,7 +9,11 @@ import org.bson.Document;
 public class StreamService {
     private static MongoService mongoService = new MongoService();
     private static Gson gson = new Gson();
-
+    /**
+     * Obtiene todas las transmisiones desde el servicio MongoDB y las devuelve en formato JSON.
+     *
+     * @return Una cadena JSON que representa todas las transmisiones.
+     */
     public static String getStream() {
         List<Document> allMessages = mongoService.getAllMessages();
 
@@ -38,5 +41,13 @@ public class StreamService {
         responseObject.add("messages", messagesArray);
 
         return gson.toJson(responseObject);
+    }
+    /**
+     * Establece el servicio Mongo utilizado para obtener mensajes para la transmisión.
+     *
+     * @param mongoService El servicio Mongo que se utilizará para obtener mensajes.
+     */
+    public void setMongoService(MongoService mongoService) {
+        this.mongoService = mongoService;
     }
 }

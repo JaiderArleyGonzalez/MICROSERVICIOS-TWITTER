@@ -117,7 +117,6 @@
     <ul id="tweets"></ul>
 </div>
 <script>
-    // Función para cargar los mensajes al abrir la página
     document.addEventListener('DOMContentLoaded', function() {
         fetchAndDisplayTweets();
         getIdToken();
@@ -162,7 +161,7 @@
         const token = localStorage.getItem('id_token');
         const tweetInput = document.getElementById('tweetInput');
         const tweetText = tweetInput.value.trim();
-        const tweetCreator = getIdToken(); // Utiliza el correo electrónico como tweetCreator
+        const tweetCreator = getIdToken();
 
         if (tweetText !== '') {
             fetch('https://2kjf5yqvmd.execute-api.us-east-1.amazonaws.com/beta/post?sender=' + tweetCreator + '&message=' + tweetText, {
