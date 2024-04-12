@@ -229,5 +229,3 @@ Se obtendrá lo siguiente:
 ## Autores
 - Jaider Arley González Arias
 - Miguel Angel Barrera Diaz
-
-## Agradecimientos
