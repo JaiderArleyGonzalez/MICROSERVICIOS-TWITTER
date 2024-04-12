@@ -8,7 +8,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        /* Estilos similares a los de la imagen de ejemplo */
         body {
             font-family: 'Montserrat', sans-serif;
             background-color: #f5f8fa;
@@ -22,6 +21,7 @@
             padding: 20px;
             border-radius: 15px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+            position: relative;
         }
         h1 {
             color: #1da1f2;
@@ -90,33 +90,122 @@
             font-size: 14px;
             font-weight: 400;
         }
+        /* Estilos para el botón de logout */
+        #logoutButton {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+        }
     </style>
 </head>
 <body>
-    <div id="container">
-        <h1>Twitter Clone</h1>
-        <div id="tweetForm">
-            <textarea id="tweetInput" placeholder="Escribe tu mensaje aquí..."></textarea>
-            <button onclick="addTweet()">Enviar Tweet</button>
-        </div>
-        <ul id="tweets"></ul>
+<!-- Botón de logout -->
+<button id="logoutButton" onclick="logout()">Logout</button>
+<div id="container">
+    <h1>Twitter Clone</h1>
+    <div id="tweetForm">
+        <textarea id="tweetInput" placeholder="Escribe tu mensaje aquí..."></textarea>
+        <button onclick="addTweet()">Enviar Tweet</button>
     </div>
-    <script>
-        function addTweet() {
-            var tweetInput = document.getElementById('tweetInput');
-            var tweetText = tweetInput.value.trim();
-            var tweetCreator = 'John Doe'; // Reemplaza con el nombre del usuario
-            var tweetDate = new Date().toLocaleString();
-            if (tweetText !== '') {
-                var tweet = document.createElement('li');
-                tweet.className = 'tweet';
-                tweet.innerHTML = '<p class="tweet-content">' + tweetText + '</p>' + '<p class="tweet-info"> Creador: ' + tweetCreator + '</p>' + '<p class="tweet-info"> Fecha: ' + tweetDate + '</p>';
-                document.getElementById('tweets').appendChild(tweet);
-                tweetInput.value = '';
+    <ul id="tweets"></ul>
+</div>
+<script>
+    // Función para cargar los mensajes al abrir la página
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchAndDisplayTweets();
+        getIdToken();
+    });
+
+    function fetchAndDisplayTweets() {
+        const token = localStorage.getItem('id_token');
+        if (!token) {
+            window.location.href = 'https://welcomepagems.s3.amazonaws.com/index.html';
+            return;
+        }
+        fetch('https://2kjf5yqvmd.execute-api.us-east-1.amazonaws.com/beta/stream', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('tweets').innerHTML = '';
+            if (data.messages && data.messages.length > 0) {
+                for (let i = data.messages.length - 1; i >= 0; i--) {
+                    const message = data.messages[i];
+                    const tweet = document.createElement('li');
+                    tweet.className = 'tweet';
+                    const tweetDate = new Date().toLocaleString();
+                    tweet.innerHTML = '<p class="tweet-content">' + message.message + '</p>' +
+                                        '<p class="tweet-info"> Creador: ' + message.sender + '</p>' +
+                                        '<p class="tweet-info"> Fecha: ' + tweetDate + '</p>';
+                    document.getElementById('tweets').appendChild(tweet);
+                }
             } else {
-                alert('Por favor, escribe un mensaje antes de enviar.');
+                console.log('No hay mensajes para mostrar');
+            }
+        })
+        .catch(error => {
+            console.error('Error al cargar los mensajes:', error);
+            alert('Error al cargar los mensajes. Por favor, inténtalo de nuevo.');
+        });
+    }
+
+    function addTweet() {
+        const token = localStorage.getItem('id_token');
+        const tweetInput = document.getElementById('tweetInput');
+        const tweetText = tweetInput.value.trim();
+        const tweetCreator = getIdToken(); // Utiliza el correo electrónico como tweetCreator
+
+        if (tweetText !== '') {
+            fetch('https://2kjf5yqvmd.execute-api.us-east-1.amazonaws.com/beta/post?sender=' + tweetCreator + '&message=' + tweetText, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al enviar el tweet');
+                }
+                fetchAndDisplayTweets();
+                tweetInput.value = '';
+            })
+            .catch(error => {
+                console.error('Error al enviar el tweet:', error);
+                alert('Error al enviar el tweet. Por favor, inténtalo de nuevo.');
+            });
+        } else {
+            alert('Por favor, escribe un mensaje antes de enviar.');
+        }
+    }
+
+    function logout() {
+    window.location.href = 'https://twittlogin.auth.us-east-1.amazoncognito.com/logout?client_id=5t0qkms3n3hu86be847ial665l&logout_uri=https://welcomepagems.s3.amazonaws.com/index.html';
+}
+
+    function getIdToken() {
+        const hashParams = window.location.hash.substring(1).split('&');
+        let email = '';
+        for (let i = 0; i < hashParams.length; i++) {
+            const param = hashParams[i].split('=');
+            if (param[0] === 'id_token') {
+                const token = decodeURIComponent(param[1]);
+                const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+                email = tokenPayload.email;
+                localStorage.setItem('id_token', token);
+                break;
             }
         }
-    </script>
+        return email;
+    }
+</script>
 </body>
 </html>

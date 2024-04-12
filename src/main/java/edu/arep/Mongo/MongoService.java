@@ -17,7 +17,7 @@ import java.util.List;
  */
 public class MongoService {
 
-    private static final String URL_DATABASE = "mongodb://ec2-54-152-14-201.compute-1.amazonaws.com:27017/";
+    private static final String URL_DATABASE = "mongodb://ec2-18-207-245-122.compute-1.amazonaws.com:27017/";
     private static final String DATABASE_NAME = "stream";
     private static final String COLLECTION_NAME = "messages";
 
