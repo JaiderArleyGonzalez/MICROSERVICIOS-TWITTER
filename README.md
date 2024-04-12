@@ -22,6 +22,8 @@ El proyecto "Twitter Clone" es una aplicación web que simula la funcionalidad b
 
 ## Funcionamiento
 
+https://github.com/JaiderArleyGonzalez/MICROSERVICIOS-TWITTER/assets/89174283/a32ea6f8-c420-4fcd-99cb-f65d1afa3791
+
 ## Prerrequisitos
 
 1. **Java Development Kit (JDK)**: Asegúrate de tener instalado al menos JDK 17 o superior en tu sistema. Puedes descargarlo e instalarlo desde [la página oficial de OpenJDK](https://www.oracle.com/co/java/technologies/downloads/).
